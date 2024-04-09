@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.itau.songs.model.SongModel;
 import com.itau.songs.repository.*;
 import com.itau.songs.dtos.*;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +32,7 @@ public class SongController {
     // injeção de dependências , permite criar essa tabela a partir da estrutura
     @Autowired
     private SongRepository songRepository;
-    
+
     @PostMapping
     public ResponseEntity<SongModel> saveSong(@RequestBody @Valid SongRecordDTO songRecordDTO) {
         var songModel = new SongModel();
@@ -77,20 +79,21 @@ public class SongController {
         }
 
         songRepository.delete(song.get());
-        return ResponseEntity.status(HttpStatus.OK).body("The song was deleted successfully - 200");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap("message", "The song was deleted successfully"));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> partialUpdateSong(@PathVariable(value = "id") UUID id,
-                                                     @RequestBody @Valid SongRecordDTO songRecordDTO) {
+            @RequestBody @Valid SongRecordDTO songRecordDTO) {
         Optional<SongModel> optionalSong = songRepository.findById(id);
-    
+
         if (optionalSong.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Song was not found - 404");
         }
-    
+
         SongModel existingSong = optionalSong.get();
-    
+
         if (songRecordDTO.title() != null) {
             existingSong.setTitle(songRecordDTO.title());
         }
@@ -103,9 +106,9 @@ public class SongController {
         if (songRecordDTO.isSaved() != null) {
             existingSong.setIsSaved(songRecordDTO.isSaved());
         }
-    
+
         SongModel updatedSong = songRepository.save(existingSong);
-    
+
         return ResponseEntity.status(HttpStatus.OK).body(updatedSong);
     }
 }
