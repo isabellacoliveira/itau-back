@@ -30,7 +30,7 @@ public class SongController {
     // injeção de dependências , permite criar essa tabela a partir da estrutura
     @Autowired
     private SongRepository songRepository;
-
+    
     @PostMapping
     public ResponseEntity<SongModel> saveSong(@RequestBody @Valid SongRecordDTO songRecordDTO) {
         var songModel = new SongModel();
@@ -108,6 +108,4 @@ public class SongController {
     
         return ResponseEntity.status(HttpStatus.OK).body(updatedSong);
     }
-    
-
 }
